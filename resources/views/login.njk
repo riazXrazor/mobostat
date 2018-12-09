@@ -1,0 +1,29 @@
+{% extends 'layouts/login' %}
+
+{% block content %}
+<div class="animate form login_form">
+  <section class="login_content">
+    <form method="post" action="/login">
+      <h1>Admin Login</h1>
+      {% if(old('errors')) %}
+          <div class="alert alert-danger" role="alert">{{ old('errors') }}</div>
+      {% endif %}
+      <div>
+        <input type="text" class="form-control" placeholder="Email" name="email" required="" value="{{ old('email') }}" />
+      </div>
+      <div>
+        <input type="password" class="form-control" placeholder="Password" name="password" required="" />
+      </div>
+      <div>
+        <button type="submit" class="btn btn-default submit" name="login" value="login">Login</button>
+        <button type="reset" class="btn btn-default submit">Cancle</button>
+
+      </div>
+
+
+      </div>
+      {{ csrfField }}
+    </form>
+  </section>
+</div>
+{% endblock %}

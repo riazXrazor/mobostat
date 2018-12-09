@@ -1,0 +1,176 @@
+{% extends 'layouts/admin' %}
+
+{% block content %}
+<!-- top tiles -->
+          <div class="row tile_count">
+            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+              <span class="count_top"><i class="fa fa-user"></i> Total Customers</span>
+              <div class="count">{{ customers | length }}</div>
+              {# <span class="count_bottom"><i class="green">4% </i> From last Week</span> #}
+            </div>
+            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+              <span class="count_top"><i class="fa fa-user"></i> Total Operators</span>
+              <div class="count">{{ operators | length }}</div>
+              {# <span class="count_bottom"><i class="green">4% </i> From last Week</span> #}
+            </div>
+
+            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+              <span class="count_top"><i class="fa fa-user"></i> Today's Collections</span>
+              <div class="count"><i class="fa fa-inr"></i>{{ today_amount }}</div>
+              {# <span class="count_bottom"><i class="green"><i class="fa fa-sort-asc"></i>34% </i> From last Week</span> #}
+            </div>
+            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+              <span class="count_top"><i class="fa fa-user"></i> Total Collections</span>
+              <div class="count"><i class="fa fa-inr"></i>{{ total_amount }}</div>
+              {# <span class="count_bottom"><i class="green"><i class="fa fa-sort-asc"></i>34% </i> From last Week</span> #}
+            </div>
+            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+              <span class="count_top"><i class="fa fa-user"></i> Today's Recharges</span>
+              <div class="count">{{ recharges | length }}</div>
+              {# <span class="count_bottom"> From last Week</span> #}
+            </div>
+            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+              <span class="count_top"><i class="fa fa-user"></i> Total Recharges</span>
+              <div class="count">{{ recharges | length }}</div>
+              {# <span class="count_bottom"><i class="green">4% </i> From last Week</span> #}
+            </div>
+          </div>
+          <!-- /top tiles -->
+
+          <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+              <div class="dashboard_graph">
+
+                <div class="row x_title">
+                  <div class="col-md-6">
+                    <h3>Daily Recharge Summery <small>summery for this month till now</small></h3>
+                  </div>
+
+                </div>
+
+                <div class="col-md-9 col-sm-9 col-xs-12">
+                  <div id="chart_plot_02" class="demo-placeholder"></div>
+                </div>
+                <div class="col-md-3 col-sm-3 col-xs-12 bg-white">
+                  <div class="x_title">
+                    <h2>Operator Balance</h2>
+                    <div class="clearfix"></div>
+                  </div>
+
+                  <div class="col-md-12 col-sm-12 col-xs-6">
+
+                    {% for operator in operators %}
+                    <div>
+                      {% set p = ((operator.balance_cr/operator.balance_total) * 100) | int  %}
+                      <p>{{ operator.name }} | <small>{{ p }}% |  <small><i class="fa fa-inr"></i> {{ operator.balance_cr }} </small></small> </p>
+                      <div class="">
+
+                        {% set class = 'green'  %}
+                          {% if p < 20 %}
+                            {% set class = 'red'  %}
+                          {% elif  p < 50 %}
+                           {% set class = 'orange'  %}
+                          {% endif %}
+                        <div class="progress progress_sm" style="width: {{ p }}%;">
+                          <div class="progress-bar bg-{{ class }}" role="progressbar" data-transitiongoal="{{ p }}"></div>
+                        </div>
+                      </div>
+                    </div>
+                    {% endfor %}
+                  </div>
+
+                </div>
+
+                <div class="clearfix"></div>
+              </div>
+            </div>
+
+          </div>
+
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+
+    var chart_plot_02_settings = {
+      grid: {
+        show: true,
+        aboveData: true,
+        color: "#3f3f3f",
+        labelMargin: 10,
+        axisMargin: 0,
+        borderWidth: 0,
+        borderColor: null,
+        minBorderMargin: 5,
+        clickable: true,
+        hoverable: true,
+        autoHighlight: true,
+        mouseActiveRadius: 100
+      },
+      series: {
+        lines: {
+          show: true,
+          fill: true,
+          lineWidth: 2,
+          steps: false
+        },
+        points: {
+          show: true,
+          radius: 4.5,
+          symbol: "circle",
+          lineWidth: 3.0
+        }
+      },
+      legend: {
+        position: "ne",
+        margin: [0, -25],
+        noColumns: 0,
+        labelBoxBorderColor: null,
+        labelFormatter: function(label, series) {
+          return label + '&nbsp;&nbsp;';
+        },
+        width: 40,
+        height: 1
+      },
+      colors: ["rgba(38, 185, 154, 0.38)", "rgba(3, 88, 106, 0.38)"],
+      shadowSize: 0,
+      tooltip: true,
+      tooltipOpts: {
+        content: "%s: %y.0",
+        xDateFormat: "%d/%m",
+      shifts: {
+        x: -30,
+        y: -50
+      },
+      defaultTheme: false
+      },
+      yaxis: {
+        min: 0
+      },
+      xaxis: {
+        mode: "time",
+        minTickSize: [1, "day"],
+        timeformat: "%d/%m/%y",
+        min: {{ chart_data[0][0] }},
+        max: {{ chart_data[chart_data.length - 1][0] }}
+      }
+    };
+
+    if ($("#chart_plot_02").length){
+      console.log('Plot2');
+
+      $.plot( $("#chart_plot_02"),
+      [{
+        label: " Daily Recharge",
+        data: {{ chart_data | json }},
+        lines: {
+          fillColor: "rgba(150, 202, 89, 0.12)"
+        },
+        points: {
+          fillColor: "#fff" }
+      }], chart_plot_02_settings);
+
+    }
+
+</script>
+{% endblock %}

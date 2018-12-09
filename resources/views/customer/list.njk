@@ -1,0 +1,98 @@
+{% extends 'layouts/admin' %}
+
+{% block content %}
+<div class="">
+<div class="page-title">
+    <div class="title_left">
+        <h3>Customer Management</h3>
+    </div>
+
+    <div class="title_right">
+        <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
+            <div class="input-group">
+              <form class="" action="/customer" style="display: inherit;">
+                <input type="text" class="form-control" name="search" placeholder="Search for...">
+                <span class="input-group-btn">
+                      <button class="btn btn-default" type="submit">Go!</button>
+                    </span>
+
+              </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="clearfix"></div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>Customers</h2>
+
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+
+                <p>List of customers</p>
+                    <a href="/customer/add" class="btn btn-primary btn pull-right"><i class="fa fa-plus"></i> Add </a>
+                <!-- start project list -->
+                <table class="table table-striped projects">
+                    <thead>
+                    <tr>
+                        <th style="width: 1%">#</th>
+                        <th>Mobile Number</th>
+                        <th>Created</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                      {%  for customer in customers.data %}
+                      <tr>
+                          <td>#</td>
+                          <td>
+                              <a href="customer/history/{{ customer.id }}">{{ customer.mobile_no }}</a>
+                          </td>
+                          <td>
+                            {{ customer.created_at }}
+                          </td>
+                      </tr>
+                      {% endfor %}
+
+                    </tbody>
+                </table>
+                {% if customers.total > 20 %}
+                <nav aria-label="Page navigation">
+                  <ul class="pagination">
+                   {% if customers.currentPage != 1 %}
+                    <li>
+                      <a href="/customer?page=1" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                      </a>
+                    </li>
+                    {% endif %}
+                    {%  for i in range(1, customers.lastPage+1) %}
+                      {% set class = '' %}
+                      {% if customers.currentPage == i %}
+                        {% set class = 'active' %}
+                      {% endif %}
+                    <li class="{{ class }}"><a href="/customer?page={{ i }}">{{ i }}</a></li>
+                    {% endfor %}
+                     {% if customers.currentPage != customers.lastPage %}
+                    <li>
+                      <a href="/customer?page={{ customers.lastPage }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                      </a>
+                    </li>
+                    {% endif %}
+                  </ul>
+                </nav>
+                {% endif %}
+                <!-- end project list -->
+
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

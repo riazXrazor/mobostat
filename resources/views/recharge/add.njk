@@ -1,0 +1,167 @@
+{% extends 'layouts/admin' %}
+
+{% block content %}
+<div class="">
+            <div class="page-title">
+              <div class="title_left">
+                <h3>Manage Recharge</h3>
+              </div>
+              <div class="title_right">
+                  <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
+                      <div class="input-group">
+                        <form class="" action="/recharge" style="display: inherit;">
+                          <input type="text" class="form-control" name="search" placeholder="Search for...">
+                          <span class="input-group-btn">
+                                <button class="btn btn-default" type="submit">Go!</button>
+                              </span>
+
+                        </form>
+
+                      </div>
+                  </div>
+              </div>
+            </div>
+            <div class="clearfix"></div>
+            <div class="row">
+              <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2>Customer Recharge </h2>
+
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content">
+                    <br />
+
+                    {% if old('error') %}
+                        <div class="alert alert-danger" role="alert">{{  old('error') }}</div>
+                    {% endif %}
+                    {% if old('success') %}
+                        <div class="alert alert-success" role="alert">{{  old('success') }}</div>
+                    {% endif %}
+                    <div>
+                    <form id="demo-form2" method="POST" action="/recharge" data-parsley-validate class="form-horizontal form-label-left">
+                      {{ csrfField }}
+                      <div class="form-group">
+                        <label for="middle-name" class="control-label col-md-3 col-sm-3 col-xs-12">&nbsp;</label>
+                        <div class="col-md-3 col-sm-3 col-xs-12">
+                          <datalist id="mobile_numbers">
+                            {% for customer in customers %}
+                              <option value="{{ customer.mobile_no }}">{{ customer.mobile_no }}</small></option>
+                            {% endfor %}
+                            </datalist>
+                          <input id="mobile" list="mobile_numbers" class="form-control col-md-7 col-xs-12" type="text" name="mobile" placeholder="Mobile number" value="">
+                        </div>
+                        <div class="col-md-2 col-sm-2 col-xs-12">
+                          <input id="amount" class="form-control col-md-7 col-xs-12" type="text" name="amount" placeholder="Amount" value="">
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <label for="middle-name" class="control-label col-md-3 col-sm-3 col-xs-12">&nbsp;</label>
+                        <div class="col-md-4 col-sm-4 col-xs-12">
+                          <select id="operator" name="operator" class="form-control" required>
+                              <option value="">Choose Operator</option>
+                              {% for operator in operators %}
+                                <option value="{{ operator.id }}">{{ operator.name }}&nbsp;|&nbsp;<small>Rs {{ operator.balance_cr }}</small></option>
+                              {% endfor %}
+                          </select>
+                        </div>
+
+                        <div class="col-md-2 col-sm-2 col-xs-12">
+                            <button type="submit" class="btn btn-success" name="recharge" value="recharge">Done</button>
+                        </div>
+                      </div>
+
+                    </form>
+                      <div class="ln_solid"></div>
+                  </div>
+                  <table class="table table-striped projects">
+                      <thead>
+                      <tr>
+                          <th style="width: 1%">#</th>
+                          <th>Mobile Number</th>
+                          <th>Amount</th>
+                          <th>Status</th>
+                          <th>Date</th>
+                          <th>Action</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                        {%  for recharge in recharges.data %}
+                        <tr>
+                            <td>#</td>
+                            <td>
+                                <a>{{ recharge.mobile_no }}</a>
+                            </td>
+                            <td>
+                              <i class="fa fa-inr"></i> {{ recharge.amount }}
+                            </td>
+                            <td>
+                              {% if recharge.status == 'P' %}
+                                {% set text = 'Pending' %}
+                                {% set class='warning' %}
+                              {% elif recharge.status == 'C' %}
+                                {% set text = 'Complet' %}
+                                {% set class='success' %}
+                              {% else %}
+                                {% set text = 'Cancled' %}
+                                {% set class='danger' %}
+                              {% endif %}
+                              <button type="button" class="btn btn-{{ class }} btn-xs">
+                                {{ text }}
+                              </button>
+                            </td>
+                            <td>
+                              {{ recharge.created_at }}
+                            </td>
+                            <td>
+                              <form id="demo-form2" method="POST" action="/recharge?_method=PUT" data-parsley-validate class="form-horizontal form-label-left">
+                                <select id="status" onchange="$(this).parent().submit()" name="status" class="form-control" required>
+                                      <option value="P" {% if recharge.status == 'A' %} selected {% endif %}>Pending</option>
+                                      <option value="C" {% if recharge.status == 'C' %} selected {% endif %}>Complete</option>
+                                      <option value="X" {% if recharge.status == 'X' %} selected {% endif %}>Cancled</option>
+                                </select>
+                                <input type="hidden" name="id" value="{{ recharge.id }}">
+                                <input type="hidden" name="update" value="update">
+                                {{ csrfField }}
+                              </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                      </tbody>
+                  </table>
+                  {% if recharges.total > 20 %}
+                  <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                     {% if recharges.currentPage != 1 %}
+                      <li>
+                        <a href="/recharge?page=1" aria-label="Previous">
+                          <span aria-hidden="true">&laquo;</span>
+                        </a>
+                      </li>
+                      {% endif %}
+                      {%  for i in range(1, recharges.lastPage+1) %}
+                        {% set class = '' %}
+                        {% if recharges.currentPage == i %}
+                          {% set class = 'active' %}
+                        {% endif %}
+                      <li class="{{ class }}"><a href="/recharge?page={{ i }}">{{ i }}</a></li>
+                      {% endfor %}
+                       {% if recharges.currentPage != recharges.lastPage %}
+                      <li>
+                        <a href="/recharge?page={{ recharges.lastPage }}" aria-label="Next">
+                          <span aria-hidden="true">&raquo;</span>
+                        </a>
+                      </li>
+                      {% endif %}
+                    </ul>
+                  </nav>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+          </div>
+</div>
+{% endblock %}

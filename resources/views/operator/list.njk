@@ -1,0 +1,109 @@
+{% extends 'layouts/admin' %}
+
+{% block content %}
+<div class="">
+<div class="page-title">
+    <div class="title_left">
+        <h3>Operator Management</h3>
+    </div>
+
+    <div class="title_right">
+        <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search for...">
+                <span class="input-group-btn">
+                      <button class="btn btn-default" type="button">Go!</button>
+                    </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="clearfix"></div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>Operators</h2>
+
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+
+                <p>List of Mobile Operators</p>
+                    <a href="/operator/add" class="btn btn-primary btn pull-right"><i class="fa fa-plus"></i> Add </a>
+                <!-- start project list -->
+                <table class="table table-striped projects">
+                    <thead>
+                    <tr>
+                        <th style="width: 1%">#</th>
+                        <th style="width: 20%">Name</th>
+                        <th>Logo</th>
+                        <th>Balance</th>
+                        <th>Status</th>
+                        <th style="width: 20%">#Edit</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                      {%  for operator in operators %}
+                      <tr>
+                          <td>#</td>
+                          <td>
+                              <a>{{ operator.name }}</a>
+                              <br />
+                              <small>Created {{ operator.created_at }}</small>
+                          </td>
+                          <td>
+                            <img src="/uploads/{{ operator.logo }}" class="avatar" alt="{{ operator.name }}">
+                          </td>
+                          <td class="project_progress">
+                             {% set p = ((operator.balance_cr/operator.balance_total) * 100) | int  %}
+                             {% set class = 'green'  %}
+                               {% if p < 20 %}
+                                 {% set class = 'red'  %}
+                               {% elif  p < 50 %}
+                                {% set class = 'orange'  %}
+                               {% endif %}
+                              <div class="progress progress_sm">
+                                  <div class="progress-bar bg-{{ class }}" role="progressbar" data-transitiongoal="{{ p }}"></div>
+                              </div>
+                              <small>{{ p }}% </small>
+                               | <small><i class="fa fa-inr"></i> {{ operator.balance_cr }} </small>
+                          </td>
+                          <td>
+                            {% if operator.status == 'A' %}
+                              {% set text = 'Active' %}
+                              {% set class='success' %}
+                            {% elif operator.status == 'I' %}
+                              {% set text = 'Inactive' %}
+                              {% set class='warning' %}
+                            {% else %}
+                              {% set text = 'Empty' %}
+                              {% set class='danger' %}
+                            {% endif %}
+                            <button type="button" class="btn btn-{{ class }} btn-xs">
+                              {{ text }}
+                            </button>
+                          </td>
+                          <td>
+                              <a href="operator/refill/{{ operator.id }}" class="btn btn-primary btn-xs"><i class="fa fa-folder"></i> Refill </a>
+                              <a href="operator/edit/{{ operator.id }}" class="btn btn-info btn-xs"><i class="fa fa-pencil"></i> Edit </a>
+                              <a href="javascript:void(0)" onClick="$('#delete-form').submit()" class="btn btn-danger btn-xs"><i class="fa fa-trash-o"></i> Delete </a>
+                              {{ form.open({url: '/operator/'+operator.id, method: 'DELETE', id:'delete-form'}) }}
+                                {{ csrfField }}
+                              {{ form.close() }}
+                          </td>
+                      </tr>
+                      {% endfor %}
+
+                    </tbody>
+                </table>
+                <!-- end project list -->
+
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

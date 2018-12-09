@@ -1,0 +1,74 @@
+{% extends 'layouts/admin' %}
+
+{% block content %}
+<div class="">
+            <div class="page-title">
+              <div class="title_left">
+                <h3>Operators</h3>
+              </div>
+
+            </div>
+            <div class="clearfix"></div>
+            <div class="row">
+              <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2>Refill Operator Balance </h2>
+
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content">
+                    <br />
+
+                    {% if old('error') %}
+                        <div class="alert alert-danger" role="alert">{{  old('error') }}</div>
+                    {% endif %}
+                    {% if old('success') %}
+                        <div class="alert alert-success" role="alert">{{  old('success') }}</div>
+                    {% endif %}
+                    <div>
+                    <form id="demo-form2" method="POST" action="/operator/refill/{{ operator.id }}" data-parsley-validate class="form-horizontal form-label-left">
+                      {{ csrfField }}
+                      <div class="form-group">
+                        <label for="middle-name" class="control-label col-md-3 col-sm-3 col-xs-12">Balance <span class="required">*</span></label>
+                        <div class="col-md-4 col-sm-4 col-xs-12">
+                          <input id="balance" class="form-control col-md-7 col-xs-12" type="text" name="balance" value="">
+                        </div>
+                        <div class="col-md-2 col-sm-2 col-xs-12">
+                            <button type="submit" class="btn btn-success" name="refill" value="refill">Refill</button>
+                        </div>
+                      </div>
+
+                    </form>
+                      <div class="ln_solid"></div>
+                  </div>
+                  <table class="table table-striped projects">
+                      <thead>
+                      <tr>
+                          <th style="width: 1%">#</th>
+                          <th>Amount</th>
+                          <th>Date</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                        {%  for refill in refills %}
+                        <tr>
+                            <td>#</td>
+                            <td>
+                                <a>{{ refill.amount }}</a>
+                            </td>
+                            <td>
+                              {{ refill.created_at }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                      </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+          </div>
+</div>          
+{% endblock %}
